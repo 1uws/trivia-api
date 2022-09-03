@@ -156,18 +156,13 @@ def create_app(test_config=None):
 	def search_questions():
 		json_request = request.get_json()
 		search_term = json_request.get('searchTerm', '').lower()
-		print('search_term ', search_term)
-		if '' == search_term:
-			abort(404)
 		questions = Question.query.order_by(Question.id).all()
-		print([q.format() for q in questions])
-		result_questions = [q.format() for q in questions if search_term in q.question]
-		print('result_questions ', result_questions)
+		result_questions = [question.format() for question in questions if search_term in question.question.lower()]
 		return jsonify(
 			{
 				'success': True,
 				'questions': result_questions,
-				'total_questions':len(questions),
+				'total_questions': len(questions),
 			}
 		)
 
@@ -183,8 +178,8 @@ def create_app(test_config=None):
 	def get_categorical_questions(category_id):
 		questions = Question.query.filter(Question.category == category_id).all()
 		questions = [question.format() for question in questions]
-		if 0 == len(questions):
-			abort(404)
+		# if 0 == len(questions):
+		# 	abort(404)
 		return jsonify(
 			{
 				'success': True,
