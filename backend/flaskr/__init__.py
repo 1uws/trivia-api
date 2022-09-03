@@ -23,10 +23,20 @@ def create_app(test_config=None):
 	"""
 	@TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
 	"""
+	CORS(app)
 
 	"""
 	@TODO: Use the after_request decorator to set Access-Control-Allow
 	"""
+	@app.after_request
+	def after_request(response):
+		response.headers.add(
+			"Access-Control-Allow-Headers", "Content-Type,Authorization,true"
+		)
+		response.headers.add(
+			"Access-Control-Allow-Methods", "GET,POST,DELETE"
+		)
+		return response
 
 	"""
 	@TODO:
@@ -34,7 +44,7 @@ def create_app(test_config=None):
 	for all available categories.
 	"""
 	@app.route('/categories', methods=['GET'])
-	def get_categoris():
+	def categories():
 		categories = {}
 		category_dicts = [{category.id: category.type} for category in Category.query.order_by(Category.id).all()]
 		for category in category_dicts:
@@ -59,7 +69,7 @@ def create_app(test_config=None):
 	Clicking on the page numbers should update the questions.
 	"""
 	@app.route("/questions", methods=["GET"])
-	def get_questions():
+	def questions():
 		questions = Question.query.order_by(Question.id).all()
 		page = request.args.get("page", 1, type=int)
 		result_questions = [question.format() for question in paginate_query(page, questions)]
@@ -67,15 +77,12 @@ def create_app(test_config=None):
 		category_dicts = [{category.id: category.type} for category in Category.query.order_by(Category.id).all()]
 		for category in category_dicts:
 			categories.update(category)
-		if 0 == len(result_questions):
-			abort(404)
 		return jsonify(
 			{
 				"success": True,
 				"questions": result_questions,
 				"total_questions": len(questions),
 				"categories": categories,
-				# "current_category": ,
 			}
 		)
 
@@ -175,11 +182,9 @@ def create_app(test_config=None):
 	category to be shown.
 	"""
 	@app.route('/categories/<int:category_id>/questions', methods=['GET'])
-	def get_categorical_questions(category_id):
+	def get_questions_by_category(category_id):
 		questions = Question.query.filter(Question.category == category_id).all()
 		questions = [question.format() for question in questions]
-		# if 0 == len(questions):
-		# 	abort(404)
 		return jsonify(
 			{
 				'success': True,
@@ -225,10 +230,35 @@ def create_app(test_config=None):
 				'question': question,
 			}
 		)
+
 	"""
 	@TODO:
 	Create error handlers for all expected errors
 	including 404 and 422.
 	"""
+	@app.errorhandler(400)
+	def bad_request(error):
+		return jsonify({"success": False, "error": 400, "message": "bad request"}), 400
+
+	@app.errorhandler(404)
+	def not_found(error):
+		return (
+			jsonify({"success": False, "error": 404, "message": "resource not found"}),
+			404,
+		)
+
+	@app.errorhandler(405)
+	def not_found(error):
+		return (
+			jsonify({"success": False, "error": 405, "message": "method not allowed"}),
+			405,
+		)
+
+	@app.errorhandler(422)
+	def unprocessable(error):
+		return (
+			jsonify({"success": False, "error": 422, "message": "unprocessable"}),
+			422,
+		)
 
 	return app
