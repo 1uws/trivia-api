@@ -204,7 +204,32 @@ def create_app(test_config=None):
 	one question at a time is displayed, the user is allowed to answer
 	and shown whether they were correct or not.
 	"""
+	def generator_chek_id(list_id):
+		return lambda x: x.id not in list_id
+	@app.route('/quizzes', methods=['POST'])
+	def quizzes():
+		json_request = request.get_json()
+		json_request = {
+			'previous_questions': json_request.get('previous_questions', None),
+			'quiz_category': json_request.get('quiz_category', None),
+		}
+		if None in json_request.values():
+			abort(400)
+		check_previous_id = generator_chek_id([question for question in json_request['previous_questions']])
+		questions = Question.query.filter(Question.category == json_request['quiz_category']['id']).all()
+		remain_questions = list(filter(check_previous_id, questions))
 
+		if 0 < len(remain_questions):
+			question = random.choice(remain_questions).format()
+		else:
+			question = None
+
+		return jsonify(
+			{
+				'success': True,
+				'question': question,
+			}
+		)
 	"""
 	@TODO:
 	Create error handlers for all expected errors
