@@ -15,6 +15,9 @@ def paginate_query(page, selection):
 
 	return selection[begin:end]
 
+def generator_chek_id(list_id):
+	return lambda x: x.id not in list_id
+
 def create_app(test_config=None):
 	# create and configure the app
 	app = Flask(__name__)
@@ -34,7 +37,7 @@ def create_app(test_config=None):
 			"Access-Control-Allow-Headers", "Content-Type,Authorization,true"
 		)
 		response.headers.add(
-			"Access-Control-Allow-Methods", "GET,POST,DELETE"
+			"Access-Control-Allow-Methods", "GET,POST,PUT,DELETE"
 		)
 		return response
 
@@ -96,14 +99,11 @@ def create_app(test_config=None):
 	"""
 	@app.route('/questions/<int:question_id>', methods=['DELETE'])
 	def delete_question(question_id):
+		question = Question.query.filter(Question.id == question_id).one_or_none()
+		if question is None:
+			abort(404)
 		try:
-			question = Question.query.filter(Question.id == question_id).one_or_none()
-
-			if question is None:
-				abort(404)
-
 			question.delete()
-
 			return jsonify(
 				{
 					'success': True,
@@ -182,7 +182,7 @@ def create_app(test_config=None):
 	category to be shown.
 	"""
 	@app.route('/categories/<int:category_id>/questions', methods=['GET'])
-	def get_questions_by_category(category_id):
+	def questions_by_category(category_id):
 		questions = Question.query.filter(Question.category == category_id).all()
 		questions = [question.format() for question in questions]
 		return jsonify(
@@ -204,8 +204,6 @@ def create_app(test_config=None):
 	one question at a time is displayed, the user is allowed to answer
 	and shown whether they were correct or not.
 	"""
-	def generator_chek_id(list_id):
-		return lambda x: x.id not in list_id
 	@app.route('/quizzes', methods=['POST'])
 	def quizzes():
 		json_request = request.get_json()
@@ -215,8 +213,12 @@ def create_app(test_config=None):
 		}
 		if None in json_request.values():
 			abort(400)
+
+		# filter function
 		check_previous_id = generator_chek_id([question for question in json_request['previous_questions']])
+
 		questions = Question.query.filter(Question.category == json_request['quiz_category']['id']).all()
+
 		remain_questions = list(filter(check_previous_id, questions))
 
 		if 0 < len(remain_questions):
