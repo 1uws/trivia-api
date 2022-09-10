@@ -124,9 +124,9 @@ Errors are returned as JSON objects in the following format:
 
 ```json
 {
-	"success": False,
-	"error": 400,
-	"message": "bad request",
+  "success": False,
+  "error": 400,
+  "message": "bad request",
 }
 ```
 
@@ -150,7 +150,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value, and list of categories.
 
-- Sample: curl http://127.0.0.1:5000/categories
+- Sample: ```curl http://127.0.0.1:5000/categories```
 
 ```json
 {
@@ -176,7 +176,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value, list of questions, number of total questions, and list of categories.
 
-- Sample: curl http://127.0.0.1:5000/questions?page=2
+- Sample: ```curl http://127.0.0.1:5000/questions?page=2```
 
 ```json
 {
@@ -266,7 +266,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value.
 
-- Sample: curl -X delete http://127.0.0.1:5000/questions/2
+- Sample: ```curl -X delete http://127.0.0.1:5000/questions/2```
 
 ```json
 {
@@ -282,7 +282,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value.
 
-- Sample: curl -X post http://127.0.0.1:5000/post_question -H "Content-Type: application/json" -d '{"question":"A question", "answer":"An answer", "category":"1", "difficulty":"3"}'
+- Sample: ```curl -X post http://127.0.0.1:5000/post_question -H "Content-Type: application/json" -d '{"question":"A question", "answer":"An answer", "category":"1", "difficulty":"3"}'```
 
 ```json
 {
@@ -298,7 +298,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value, list of questions, and number of total questions.
 
-- Sample: curl -X post http://127.0.0.1:5000/questions -H "Content-Type: application/json" -d '{"searchTerm":"who"}'
+- Sample: ```curl -X post http://127.0.0.1:5000/questions -H "Content-Type: application/json" -d '{"searchTerm":"who"}'```
 
 ```json
 {
@@ -338,7 +338,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value, list of questions, and number of total questions.
 
-- Sample: curl http://127.0.0.1:5000/categories/1/questions
+- Sample: ```curl http://127.0.0.1:5000/categories/1/questions```
 
 ```json
 {
@@ -387,7 +387,7 @@ The API will return four error types when requests fail:
 
 	- Returns success value, and the next question or ```null```.
 
-- Sample: curl -X post http://127.0.0.1:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions":[20], "quiz_category":{"id":1}}'
+- Sample: ```curl -X post http://127.0.0.1:5000/quizzes -H "Content-Type: application/json" -d '{"previous_questions":[20], "quiz_category":{"id":1}}'```
 
 ```json
 {
